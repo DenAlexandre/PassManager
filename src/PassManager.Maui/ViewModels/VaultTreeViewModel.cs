@@ -23,6 +23,9 @@ public partial class VaultTreeViewModel(AuthSessionService authSession, INavigat
     [ObservableProperty]
     private FolderNodeViewModel? selectedFolder;
 
+    [ObservableProperty]
+    private bool isMenuOpen;
+
     private readonly HashSet<Guid> collapsedFolderIds = [];
 
     public ObservableCollection<FolderNodeViewModel> Folders { get; } = [];
@@ -193,27 +196,37 @@ public partial class VaultTreeViewModel(AuthSessionService authSession, INavigat
     }
 
     [RelayCommand]
-    private async Task ImportExportAsync()
+    private void ToggleMenu() => IsMenuOpen = !IsMenuOpen;
+
+    [RelayCommand]
+    private void CloseMenu() => IsMenuOpen = false;
+
+    [RelayCommand]
+    private async Task ImportAsync()
     {
+        IsMenuOpen = false;
+
         var vault = authSession.Vault;
         if (vault is null)
         {
             return;
         }
 
-        var page = Shell.Current.CurrentPage;
-        var action = await page.DisplayActionSheet("Dossier", "Annuler", null, "Importer (.kdbx)", "Exporter (.kdbx)");
+        await ImportKdbxAsync(vault, Shell.Current.CurrentPage);
+    }
 
-        switch (action)
+    [RelayCommand]
+    private async Task ExportAsync()
+    {
+        IsMenuOpen = false;
+
+        var vault = authSession.Vault;
+        if (vault is null)
         {
-            case "Importer (.kdbx)":
-                await ImportKdbxAsync(vault, page);
-                break;
-
-            case "Exporter (.kdbx)":
-                await ExportKdbxAsync(vault, page);
-                break;
+            return;
         }
+
+        await ExportKdbxAsync(vault, Shell.Current.CurrentPage);
     }
 
     private async Task ImportKdbxAsync(PassManager.Core.Vault.VaultRepository vault, Page page)

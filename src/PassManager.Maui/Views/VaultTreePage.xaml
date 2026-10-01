@@ -10,13 +10,13 @@
     <Grid RowDefinitions="Auto,Auto,*" RowSpacing="0"
           BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundLight}, Dark={StaticResource BackgroundDark}}">
 
-        <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" Padding="20,14"
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,Auto" Padding="20,14"
               BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}">
-            <Label Grid.Column="0" Text="PassManager" Style="{StaticResource TitleLabel}" VerticalOptions="Center" />
-            <ActivityIndicator Grid.Column="1" IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Margin="0,0,12,0" />
-            <HorizontalStackLayout Grid.Column="2" Spacing="8">
-                <Button Text="⋯" WidthRequest="44" Command="{Binding ImportExportCommand}"
-                        BackgroundColor="Transparent" TextColor="{StaticResource Gray500}" />
+            <Button Grid.Column="0" Text="☰" WidthRequest="44" Command="{Binding ToggleMenuCommand}"
+                    BackgroundColor="Transparent" TextColor="{StaticResource Gray500}" Margin="0,0,8,0" />
+            <Label Grid.Column="1" Text="PassManager" Style="{StaticResource TitleLabel}" VerticalOptions="Center" />
+            <ActivityIndicator Grid.Column="2" IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Margin="0,0,12,0" />
+            <HorizontalStackLayout Grid.Column="3" Spacing="8">
                 <Button Text="Synchroniser" Command="{Binding SyncCommand}" />
                 <Button Text="Déconnexion" Command="{Binding LogoutCommand}"
                         BackgroundColor="Transparent" TextColor="{StaticResource Gray500}" />
@@ -30,7 +30,7 @@
             <Label Text="{Binding ErrorMessage}" TextColor="{StaticResource Danger}" Style="{StaticResource CaptionLabel}" />
         </Grid>
 
-        <Grid Grid.Row="2" ColumnDefinitions="280,1,*" Padding="0">
+        <Grid Grid.Row="2" x:Name="ContentGrid" ColumnDefinitions="280,8,*" Padding="0">
 
             <Grid Grid.Column="0" RowDefinitions="Auto,*,Auto" Padding="0">
                 <Label Grid.Row="0" Text="Dossiers" Style="{StaticResource SectionHeaderLabel}" Padding="20,16" />
@@ -76,7 +76,13 @@
                         HorizontalOptions="Start" />
             </Grid>
 
-            <BoxView Grid.Column="1" WidthRequest="1" Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" />
+            <Grid Grid.Column="1" x:Name="SplitterHandle" BackgroundColor="Transparent">
+                <Grid.GestureRecognizers>
+                    <PanGestureRecognizer PanUpdated="OnSplitterPanUpdated" />
+                </Grid.GestureRecognizers>
+                <BoxView WidthRequest="1" HorizontalOptions="Center" VerticalOptions="Fill"
+                         Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" />
+            </Grid>
 
             <Grid Grid.Column="2" RowDefinitions="Auto,*" Padding="0">
                 <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="20,16">
@@ -106,6 +112,33 @@
             </Grid>
 
         </Grid>
+
+        <Grid Grid.Row="0" Grid.RowSpan="3" IsVisible="{Binding IsMenuOpen}" BackgroundColor="Transparent">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding CloseMenuCommand}" />
+            </Grid.GestureRecognizers>
+        </Grid>
+
+        <Border Grid.Row="0" Grid.RowSpan="3" IsVisible="{Binding IsMenuOpen}"
+                HorizontalOptions="Start" VerticalOptions="Start" Margin="20,58,0,0"
+                BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}"
+                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+                StrokeShape="RoundRectangle 8" Padding="0">
+            <VerticalStackLayout WidthRequest="200" Spacing="0">
+                <Grid Padding="16,12">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ImportCommand}" />
+                    </Grid.GestureRecognizers>
+                    <Label Text="Importer (.kdbx)" TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray200}}" />
+                </Grid>
+                <Grid Padding="16,12">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ExportCommand}" />
+                    </Grid.GestureRecognizers>
+                    <Label Text="Exporter (.kdbx)" TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray200}}" />
+                </Grid>
+            </VerticalStackLayout>
+        </Border>
 
     </Grid>
 
