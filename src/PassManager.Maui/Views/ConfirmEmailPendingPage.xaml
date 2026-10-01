@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:PassManager.Maui.ViewModels"
+             x:Class="PassManager.Maui.Views.ConfirmEmailPendingPage"
+             x:DataType="vm:ConfirmEmailViewModel"
+             Title="Confirmez votre email">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="30" Spacing="16" VerticalOptions="Center">
+
+            <Label Text="Vérifiez votre boîte mail" Style="{StaticResource Headline}" HorizontalOptions="Center" />
+            <Label Text="{Binding Email, StringFormat='Un lien de confirmation a été envoyé à {0}.'}"
+                   Style="{StaticResource SubHeadline}" HorizontalOptions="Center" />
+
+            <Label Text="En environnement de développement (sans fournisseur d'email configuré), le lien est journalisé dans les logs du conteneur « api » (docker compose logs api). Collez le code ci-dessous :"
+                   FontSize="12" />
+
+            <Entry Placeholder="Code de confirmation" Text="{Binding Token}" />
+
+            <Label Text="{Binding StatusMessage}" TextColor="Green"
+                   IsVisible="{Binding StatusMessage, Converter={StaticResource StringToBoolConverter}}" />
+            <Label Text="{Binding ErrorMessage}" TextColor="Red"
+                   IsVisible="{Binding ErrorMessage, Converter={StaticResource StringToBoolConverter}}" />
+
+            <Button Text="Confirmer" Command="{Binding ConfirmCommand}" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}" />
+            <Button Text="Renvoyer le lien" Command="{Binding ResendCommand}" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" />
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
+
+            <Button Text="Retour à la connexion" Command="{Binding GoToLoginCommand}" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

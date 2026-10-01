@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:PassManager.Maui.ViewModels"
+             x:Class="PassManager.Maui.Views.EntryDetailPage"
+             x:DataType="vm:EntryDetailViewModel"
+             Title="Entrée">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="12">
+
+            <Label Text="Titre" FontAttributes="Bold" />
+            <Entry Text="{Binding Title}" />
+
+            <Label Text="URL" FontAttributes="Bold" />
+            <Entry Text="{Binding Url}" Keyboard="Url" />
+
+            <Label Text="Identifiant" FontAttributes="Bold" />
+            <Grid ColumnDefinitions="*,Auto">
+                <Entry Grid.Column="0" Text="{Binding Login}" />
+                <Button Grid.Column="1" Text="Copier" Command="{Binding CopyLoginCommand}" />
+            </Grid>
+
+            <Label Text="Mot de passe" FontAttributes="Bold" />
+            <Grid ColumnDefinitions="*,Auto,Auto">
+                <Entry Grid.Column="0" Text="{Binding Password}" IsPassword="{Binding IsPasswordHidden}" />
+                <Button Grid.Column="1" Text="👁" Command="{Binding ToggleRevealCommand}" />
+                <Button Grid.Column="2" Text="Copier" Command="{Binding CopyPasswordCommand}" />
+            </Grid>
+
+            <Label Text="Mémo" FontAttributes="Bold" />
+            <Editor Text="{Binding Memo}" HeightRequest="100" AutoSize="TextChanges" />
+
+            <Label Text="{Binding ErrorMessage}" TextColor="Red"
+                   IsVisible="{Binding ErrorMessage, Converter={StaticResource StringToBoolConverter}}" />
+
+            <HorizontalStackLayout Spacing="8">
+                <Button Text="Enregistrer" Command="{Binding SaveCommand}" />
+                <Button Text="Annuler" Command="{Binding CancelCommand}" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" />
+            </HorizontalStackLayout>
+
+            <Button Text="Supprimer" Command="{Binding DeleteCommand}" TextColor="Red" BackgroundColor="Transparent" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

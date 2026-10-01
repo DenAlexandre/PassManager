@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:PassManager.Maui.ViewModels"
+             x:Class="PassManager.Maui.Views.VaultTreePage"
+             x:Name="RootPage"
+             x:DataType="vm:VaultTreeViewModel"
+             Title="Mon coffre">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto,*" Padding="12" RowSpacing="8">
+
+        <HorizontalStackLayout Grid.Row="0" Spacing="8">
+            <Button Text="Synchroniser" Command="{Binding SyncCommand}" />
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
+            <Button Text="Déconnexion" Command="{Binding LogoutCommand}" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" />
+        </HorizontalStackLayout>
+
+        <Label Grid.Row="1" Text="{Binding StatusMessage}" TextColor="Green"
+               IsVisible="{Binding StatusMessage, Converter={StaticResource StringToBoolConverter}}" />
+        <Label Grid.Row="1" Text="{Binding ErrorMessage}" TextColor="Red"
+               IsVisible="{Binding ErrorMessage, Converter={StaticResource StringToBoolConverter}}" />
+
+        <Border Grid.Row="2" Stroke="LightGray" StrokeThickness="1">
+            <Grid RowDefinitions="Auto,*">
+                <Label Grid.Row="0" Text="Dossiers" FontAttributes="Bold" Padding="8,4" BackgroundColor="#f0f0f0" />
+                <CollectionView Grid.Row="1" ItemsSource="{Binding Folders}"
+                                SelectionMode="Single" SelectedItem="{Binding SelectedFolder}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:FolderNodeViewModel">
+                            <Grid Padding="4" ColumnDefinitions="*,Auto" Margin="{Binding Indent}">
+                                <Label Grid.Column="0" Text="{Binding Name}" VerticalOptions="Center" />
+                                <Button Grid.Column="1" Text="..." WidthRequest="40" Padding="0"
+                                        IsVisible="{Binding IsRoot, Converter={StaticResource InvertedBoolConverter}}"
+                                        Command="{Binding BindingContext.FolderOptionsCommand, Source={x:Reference RootPage}}"
+                                        CommandParameter="{Binding .}" />
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+        </Border>
+
+        <HorizontalStackLayout Grid.Row="3" Spacing="8">
+            <Button Text="Nouveau dossier" Command="{Binding NewFolderCommand}" />
+            <Button Text="Nouvelle entrée" Command="{Binding NewEntryCommand}" />
+        </HorizontalStackLayout>
+
+        <Border Grid.Row="4" Stroke="LightGray" StrokeThickness="1">
+            <Grid RowDefinitions="Auto,*">
+                <Label Grid.Row="0" Text="Entrées" FontAttributes="Bold" Padding="8,4" BackgroundColor="#f0f0f0" />
+                <CollectionView Grid.Row="1" ItemsSource="{Binding Entries}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:EntryRowViewModel">
+                            <Grid Padding="8" ColumnDefinitions="*,*">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding BindingContext.OpenEntryCommand, Source={x:Reference RootPage}}"
+                                        CommandParameter="{Binding .}" />
+                                </Grid.GestureRecognizers>
+                                <Label Grid.Column="0" Text="{Binding Title}" FontAttributes="Bold" />
+                                <Label Grid.Column="1" Text="{Binding Login}" TextColor="Gray" HorizontalOptions="End" />
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+        </Border>
+
+    </Grid>
+
+</ContentPage>

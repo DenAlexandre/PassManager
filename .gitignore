@@ -1,0 +1,40 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+## Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]uild/
+[Bb]in/
+[Oo]bj/
+
+## MAUI / mobile
+*.ipa
+*.apk
+*.aab
+*.msix
+*.msixbundle
+*.appx
+*.appxbundle
+
+## Rider / VS Code
+.idea/
+.vscode/
+
+## Secrets / local config
+.env
+*.env.local
+appsettings.*.local.json
+
+## Local vault files (never commit user data)
+*.pmvault
+
+## OS
+.DS_Store
+Thumbs.db

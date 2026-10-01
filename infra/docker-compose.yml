@@ -1,0 +1,42 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-passmanager}
+      POSTGRES_USER: ${POSTGRES_USER:-passmanager}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks: [passmanager-net]
+
+  api:
+    build:
+      context: ..
+      dockerfile: backend/src/Api/Dockerfile
+    restart: unless-stopped
+    depends_on: [postgres]
+    environment:
+      ConnectionStrings__Default: "Host=postgres;Database=${POSTGRES_DB:-passmanager};Username=${POSTGRES_USER:-passmanager};Password=${POSTGRES_PASSWORD}"
+      Database__AutoMigrate: "true"
+      Jwt__SigningKey: ${JWT_SIGNING_KEY:?JWT_SIGNING_KEY is required}
+      Jwt__Issuer: "passmanager-api"
+      Jwt__AccessTokenMinutes: "15"
+      Vault__MasterKey: ${VAULT_MASTER_KEY:?VAULT_MASTER_KEY is required, base64 32 bytes}
+      Email__Provider: ${EMAIL_PROVIDER:-Console}
+      Email__Smtp__Host: ${SMTP_HOST:-}
+      Email__Smtp__Port: ${SMTP_PORT:-587}
+      Email__Smtp__User: ${SMTP_USER:-}
+      Email__Smtp__Password: ${SMTP_PASSWORD:-}
+      Email__Smtp__From: ${SMTP_FROM:-no-reply@passmanager.local}
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
+      ASPNETCORE_URLS: "http://+:8080"
+    ports:
+      - "8080:8080"
+    networks: [passmanager-net]
+
+volumes:
+  pgdata:
+
+networks:
+  passmanager-net:

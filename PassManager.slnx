@@ -1,0 +1,31 @@
+<Solution>
+  <Folder Name="/backend/" />
+  <Folder Name="/backend/src/" />
+  <Folder Name="/backend/src/Api/">
+    <Project Path="backend/src/Api/PassManager.Api.csproj" />
+  </Folder>
+  <Folder Name="/backend/src/Application/">
+    <Project Path="backend/src/Application/PassManager.Application.csproj" />
+  </Folder>
+  <Folder Name="/backend/src/Domain/">
+    <Project Path="backend/src/Domain/PassManager.Domain.csproj" />
+  </Folder>
+  <Folder Name="/backend/src/Infrastructure/">
+    <Project Path="backend/src/Infrastructure/PassManager.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/backend/tests/" />
+  <Folder Name="/backend/tests/Api.IntegrationTests/">
+    <Project Path="backend/tests/Api.IntegrationTests/PassManager.Api.IntegrationTests.csproj" />
+  </Folder>
+  <Folder Name="/backend/tests/Application.Tests/">
+    <Project Path="backend/tests/Application.Tests/PassManager.Application.Tests.csproj" />
+  </Folder>
+  <Folder Name="/backend/tests/Domain.Tests/">
+    <Project Path="backend/tests/Domain.Tests/PassManager.Domain.Tests.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/PassManager.Core.Tests/PassManager.Core.Tests.csproj" />
+    <Project Path="src/PassManager.Core/PassManager.Core.csproj" />
+    <Project Path="src/PassManager.Maui/PassManager.Maui.csproj" />
+  </Folder>
+</Solution>

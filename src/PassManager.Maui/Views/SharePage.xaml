@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:PassManager.Maui.ViewModels"
+             xmlns:sharing="clr-namespace:PassManager.Core.Sharing;assembly=PassManager.Core"
+             x:Class="PassManager.Maui.Views.SharePage"
+             x:Name="RootPage"
+             x:DataType="vm:ShareViewModel"
+             Title="Partager">
+
+    <VerticalStackLayout Padding="20" Spacing="12">
+
+        <Label Text="{Binding FolderName, StringFormat='Partager « {0} »'}" Style="{StaticResource Headline}" />
+        <Label Text="Recherchez un compte par email (2 caractères minimum)." FontSize="12" />
+
+        <Grid ColumnDefinitions="*,Auto">
+            <Entry Grid.Column="0" Placeholder="email@exemple.com" Text="{Binding Query}" Keyboard="Email" />
+            <Button Grid.Column="1" Text="Rechercher" Command="{Binding SearchCommand}" />
+        </Grid>
+
+        <Label Text="{Binding StatusMessage}" TextColor="Green"
+               IsVisible="{Binding StatusMessage, Converter={StaticResource StringToBoolConverter}}" />
+        <Label Text="{Binding ErrorMessage}" TextColor="Red"
+               IsVisible="{Binding ErrorMessage, Converter={StaticResource StringToBoolConverter}}" />
+        <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
+
+        <CollectionView ItemsSource="{Binding Results}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="sharing:UserSummary">
+                    <Grid Padding="8" ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="{Binding Email}" VerticalOptions="Center" />
+                        <Button Grid.Column="1" Text="Partager"
+                                Command="{Binding BindingContext.ShareWithCommand, Source={x:Reference RootPage}}"
+                                CommandParameter="{Binding .}" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+    </VerticalStackLayout>
+
+</ContentPage>

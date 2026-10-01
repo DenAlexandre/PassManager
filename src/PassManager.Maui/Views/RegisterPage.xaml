@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:PassManager.Maui.ViewModels"
+             x:Class="PassManager.Maui.Views.RegisterPage"
+             x:DataType="vm:RegisterViewModel"
+             Title="Créer un compte">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="30" Spacing="16" VerticalOptions="Center">
+
+            <Label Text="Nouveau compte" Style="{StaticResource Headline}" HorizontalOptions="Center" />
+            <Label Text="Ce mot de passe protège aussi votre coffre local" Style="{StaticResource SubHeadline}" HorizontalOptions="Center" />
+
+            <Entry Placeholder="Email" Keyboard="Email" Text="{Binding Email}" />
+            <Entry Placeholder="Mot de passe (8 caractères min.)" IsPassword="True" Text="{Binding Password}" />
+            <Entry Placeholder="Confirmer le mot de passe" IsPassword="True" Text="{Binding ConfirmPassword}" />
+
+            <Label Text="{Binding ErrorMessage}"
+                   TextColor="Red"
+                   IsVisible="{Binding ErrorMessage, Converter={StaticResource StringToBoolConverter}}" />
+
+            <Button Text="Créer mon compte" Command="{Binding RegisterCommand}" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}" />
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
+
+            <Button Text="J'ai déjà un compte" Command="{Binding GoToLoginCommand}" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
