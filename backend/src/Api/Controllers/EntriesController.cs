@@ -3,13 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using PassManager.Api.Common;
 using PassManager.Api.Dtos;
 using PassManager.Application.Entries;
+using PassManager.Application.Sharing;
 
 namespace PassManager.Api.Controllers;
 
 [ApiController]
 [Authorize]
 [Route("api/entries")]
-public class EntriesController(EntryService entryService) : ControllerBase
+public class EntriesController(EntryService entryService, EntrySharingService sharingService) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetByFolder([FromQuery] Guid folderId, CancellationToken ct)
@@ -62,6 +63,24 @@ public class EntriesController(EntryService entryService) : ControllerBase
         }
 
         return NoContent();
+    }
+
+    [HttpPost("{id:guid}/share")]
+    public async Task<IActionResult> Share(Guid id, ShareEntryRequestDto request, CancellationToken ct)
+    {
+        var result = await sharingService.ShareAsync(this.GetUserId(), id, request.TargetUserId, ct);
+        if (!result.Succeeded)
+        {
+            return result.Error switch
+            {
+                EntryShareError.EntryNotFound => NotFound(new ErrorResponseDto("ENTRY_NOT_FOUND", "Entrée introuvable.")),
+                EntryShareError.TargetUserNotFound => NotFound(new ErrorResponseDto("TARGET_USER_NOT_FOUND", "Compte destinataire introuvable.")),
+                EntryShareError.CannotShareToSelf => BadRequest(new ErrorResponseDto("CANNOT_SHARE_TO_SELF", "Impossible de partager une entrée avec son propre compte.")),
+                _ => BadRequest(new ErrorResponseDto("INVALID_REQUEST", "Impossible de partager cette entrée."))
+            };
+        }
+
+        return Ok(new ShareEntryResponseDto(result.NewEntryId!.Value));
     }
 
     private static EntryDto ToDto(Domain.Entities.Entry entry) =>

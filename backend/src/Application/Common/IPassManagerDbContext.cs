@@ -11,6 +11,7 @@ public interface IPassManagerDbContext
     DbSet<Folder> Folders { get; }
     DbSet<Entry> Entries { get; }
     DbSet<FolderShare> FolderShares { get; }
+    DbSet<EntryShare> EntryShares { get; }
 
     Task<int> SaveChangesAsync(CancellationToken ct = default);
 }

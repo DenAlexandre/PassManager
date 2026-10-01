@@ -15,7 +15,7 @@
                 StrokeShape="RoundRectangle 4" Padding="32,28">
             <VerticalStackLayout Spacing="16">
 
-                <Label Text="{Binding FolderName, StringFormat='Partager « {0} »'}" Style="{StaticResource TitleLabel}" />
+                <Label Text="{Binding ItemName, StringFormat='Partager « {0} »'}" Style="{StaticResource TitleLabel}" />
                 <Label Text="Recherchez un compte par email (2 caractères minimum)." Style="{StaticResource CaptionLabel}" />
 
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">

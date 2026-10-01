@@ -16,6 +16,7 @@ public class TestDbContext : DbContext, IPassManagerDbContext
     public DbSet<Folder> Folders => Set<Folder>();
     public DbSet<Entry> Entries => Set<Entry>();
     public DbSet<FolderShare> FolderShares => Set<FolderShare>();
+    public DbSet<EntryShare> EntryShares => Set<EntryShare>();
 
     public static TestDbContext Create()
     {

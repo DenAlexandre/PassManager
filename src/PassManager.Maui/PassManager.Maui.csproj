@@ -73,6 +73,15 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
 	</ItemGroup>
 
+	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
+		<!-- WinRT's FileOpenPicker/FileSavePicker throw UnauthorizedAccessException on this unpackaged app
+		     (WindowsPackageType=None) — they require a packaged process identity, which no window-handle
+		     association can work around. This package wraps the older Win32 common file dialog COM API
+		     (IFileOpenDialog/IFileSaveDialog), which has no such restriction, with zero WinForms/WPF
+		     dependency (avoids the MC6000 MAUI+UseWindowsForms conflict). -->
+		<PackageReference Include="WindowsAPICodePack.Shell.CommonFileDialogs" Version="1.1.5" />
+	</ItemGroup>
+
 	<ItemGroup>
 	  <ProjectReference Include="..\PassManager.Core\PassManager.Core.csproj" />
 	</ItemGroup>

@@ -23,6 +23,7 @@ public class PassManagerDbContext : DbContext, IPassManagerDbContext
     public DbSet<Folder> Folders => Set<Folder>();
     public DbSet<Entry> Entries => Set<Entry>();
     public DbSet<FolderShare> FolderShares => Set<FolderShare>();
+    public DbSet<EntryShare> EntryShares => Set<EntryShare>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -34,5 +35,6 @@ public class PassManagerDbContext : DbContext, IPassManagerDbContext
         modelBuilder.ApplyConfiguration(new FolderConfiguration());
         modelBuilder.ApplyConfiguration(new EntryConfiguration(_envelopeEncryption));
         modelBuilder.ApplyConfiguration(new FolderShareConfiguration());
+        modelBuilder.ApplyConfiguration(new EntryShareConfiguration());
     }
 }

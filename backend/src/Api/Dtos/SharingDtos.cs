@@ -7,3 +7,7 @@ public record ShareFolderRequestDto([Required] Guid TargetUserId);
 public record ShareFolderResponseDto(Guid NewFolderId);
 
 public record UserSummaryDto(Guid Id, string Email);
+
+public record ShareEntryRequestDto([Required] Guid TargetUserId);
+
+public record ShareEntryResponseDto(Guid NewEntryId);

@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Maui.Storage;
 using PassManager.Core.Abstractions;
 using PassManager.Core.Auth;
 using PassManager.Core.Models;
@@ -151,10 +152,222 @@ public partial class VaultTreeViewModel(AuthSessionService authSession, INavigat
     }
 
     [RelayCommand]
+    private async Task EntryOptionsAsync(EntryRowViewModel entry)
+    {
+        var vault = authSession.Vault;
+        if (vault is null)
+        {
+            return;
+        }
+
+        var page = Shell.Current.CurrentPage;
+        var action = await page.DisplayActionSheet(entry.Title, "Annuler", null, "Modifier", "Partager", "Supprimer");
+
+        switch (action)
+        {
+            case "Modifier":
+                await navigation.NavigateToAsync(nameof(EntryDetailPage), new Dictionary<string, object> { ["EntryId"] = entry.Id });
+                break;
+
+            case "Partager":
+                await navigation.NavigateToAsync(nameof(SharePage), new Dictionary<string, object> { ["EntryId"] = entry.Id, ["EntryName"] = entry.Title });
+                break;
+
+            case "Supprimer":
+                var confirmed = await page.DisplayAlert("Confirmer", $"Supprimer « {entry.Title} » ?", "Supprimer", "Annuler");
+                if (confirmed)
+                {
+                    vault.DeleteEntry(entry.Id);
+                    await authSession.SaveVaultAsync();
+                    RefreshEntries();
+                }
+                break;
+        }
+    }
+
+    [RelayCommand]
     private async Task LogoutAsync()
     {
         await authSession.LogoutAsync();
         await navigation.NavigateToAsync($"//{nameof(LoginPage)}");
+    }
+
+    [RelayCommand]
+    private async Task ImportExportAsync()
+    {
+        var vault = authSession.Vault;
+        if (vault is null)
+        {
+            return;
+        }
+
+        var page = Shell.Current.CurrentPage;
+        var action = await page.DisplayActionSheet("Dossier", "Annuler", null, "Importer (.kdbx)", "Exporter (.kdbx)");
+
+        switch (action)
+        {
+            case "Importer (.kdbx)":
+                await ImportKdbxAsync(vault, page);
+                break;
+
+            case "Exporter (.kdbx)":
+                await ExportKdbxAsync(vault, page);
+                break;
+        }
+    }
+
+    private async Task ImportKdbxAsync(PassManager.Core.Vault.VaultRepository vault, Page page)
+    {
+        FileResult? pickedFile;
+        try
+        {
+            pickedFile = await PickKdbxFileAsync();
+        }
+        catch (Exception)
+        {
+            return;
+        }
+
+        if (pickedFile is null)
+        {
+            return;
+        }
+
+        var password = await page.DisplayPromptAsync("Mot de passe", "Mot de passe du fichier KeePass", "Importer", "Annuler");
+        if (password is null)
+        {
+            return;
+        }
+
+        IsBusy = true;
+        ErrorMessage = null;
+        StatusMessage = null;
+        try
+        {
+            using var stream = await OpenPickedFileAsync(pickedFile);
+            var document = await Task.Run(() => PassManager.Core.KeePass.KdbxReader.Read(stream, password));
+            PassManager.Core.KeePass.KdbxImportService.Import(vault, document, new PassManager.Core.Common.SystemClock());
+            await authSession.SaveVaultAsync();
+            RebuildTree();
+            StatusMessage = "Import KeePass terminé.";
+        }
+        catch (PassManager.Core.KeePass.KdbxFormatException)
+        {
+            ErrorMessage = "Mot de passe incorrect ou fichier invalide.";
+        }
+        catch (Exception)
+        {
+            ErrorMessage = "Échec de l'import.";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+#if WINDOWS
+    // FileResult.OpenReadAsync() on Windows calls into WindowsRuntimeStorageExtensions.OpenStreamForReadAsync,
+    // which requires an internal WinRT StorageFile populated only when FileResult was constructed through
+    // MAUI's own (WinRT-based) FilePicker flow. Our FileResult here was built from a plain path returned by
+    // the WindowsAPICodePack dialog, so that internal state is null and OpenReadAsync throws
+    // ArgumentNullException — open the path directly with plain file I/O instead.
+    private static Task<Stream> OpenPickedFileAsync(FileResult file) => Task.FromResult<Stream>(File.OpenRead(file.FullPath));
+#else
+    private static Task<Stream> OpenPickedFileAsync(FileResult file) => file.OpenReadAsync();
+#endif
+
+#if WINDOWS
+    // WinRT's FileOpenPicker throws UnauthorizedAccessException on this unpackaged app regardless of window
+    // association (confirmed: a valid, non-zero hwnd still hits the same exception — this is a packaged-
+    // process-identity restriction, not a window-ownership one). The Win32 common file dialog COM API has
+    // no such restriction; WindowsAPICodePack.Shell.CommonFileDialogs wraps it without a WinForms/WPF dependency.
+    private Task<FileResult?> PickKdbxFileAsync()
+    {
+        using var dialog = new WindowsAPICodePack.Dialogs.CommonOpenFileDialog
+        {
+            Title = "Choisir un fichier KeePass (.kdbx)",
+            EnsureFileExists = true
+        };
+        dialog.Filters.Add(new WindowsAPICodePack.Dialogs.CommonFileDialogFilter("Fichiers KeePass", "*.kdbx"));
+
+        var result = dialog.ShowDialog();
+        FileResult? picked = result == WindowsAPICodePack.Dialogs.CommonFileDialogResult.Ok
+            ? new FileResult(dialog.FileName)
+            : null;
+        return Task.FromResult(picked);
+    }
+#else
+    private Task<FileResult?> PickKdbxFileAsync() =>
+        FilePicker.Default.PickAsync(new PickOptions { PickerTitle = "Choisir un fichier KeePass (.kdbx)" });
+#endif
+
+#if WINDOWS
+    private async Task<bool> SaveKdbxFileAsync(Page page, Stream stream)
+    {
+        using var dialog = new WindowsAPICodePack.Dialogs.CommonSaveFileDialog
+        {
+            Title = "Enregistrer le fichier KeePass",
+            DefaultFileName = "export",
+            DefaultExtension = "kdbx"
+        };
+        dialog.Filters.Add(new WindowsAPICodePack.Dialogs.CommonFileDialogFilter("Fichiers KeePass", "*.kdbx"));
+
+        if (dialog.ShowDialog() != WindowsAPICodePack.Dialogs.CommonFileDialogResult.Ok)
+        {
+            return false;
+        }
+
+        using var fileStream = File.Create(dialog.FileName);
+        await stream.CopyToAsync(fileStream);
+        return true;
+    }
+#else
+    private async Task<bool> SaveKdbxFileAsync(Page page, Stream stream)
+    {
+        var result = await CommunityToolkit.Maui.Storage.FileSaver.Default.SaveAsync("export.kdbx", stream);
+        return result.IsSuccessful;
+    }
+#endif
+
+    private async Task ExportKdbxAsync(PassManager.Core.Vault.VaultRepository vault, Page page)
+    {
+        var password = await page.DisplayPromptAsync("Mot de passe", "Nouveau mot de passe pour le fichier exporté", "Suivant", "Annuler");
+        if (string.IsNullOrEmpty(password))
+        {
+            return;
+        }
+
+        var confirmPassword = await page.DisplayPromptAsync("Confirmation", "Confirmez le mot de passe", "Exporter", "Annuler");
+        if (confirmPassword != password)
+        {
+            ErrorMessage = "Les mots de passe ne correspondent pas.";
+            return;
+        }
+
+        IsBusy = true;
+        ErrorMessage = null;
+        StatusMessage = null;
+        try
+        {
+            var document = PassManager.Core.KeePass.KdbxExportService.Export(vault);
+            using var stream = new MemoryStream();
+            await Task.Run(() => PassManager.Core.KeePass.KdbxWriter.Write(stream, document, password));
+            stream.Position = 0;
+
+            var saved = await SaveKdbxFileAsync(page, stream);
+            if (saved)
+            {
+                StatusMessage = "Export KeePass terminé.";
+            }
+        }
+        catch (Exception)
+        {
+            ErrorMessage = "Échec de l'export.";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     private void RebuildTree(Guid? preferredSelectionId = null)

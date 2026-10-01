@@ -52,14 +52,10 @@
                     <Label Text="{Binding ErrorMessage}" TextColor="{StaticResource Danger}" Style="{StaticResource CaptionLabel}"
                            IsVisible="{Binding ErrorMessage, Converter={StaticResource StringToBoolConverter}}" />
 
-                    <BoxView HeightRequest="1" Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" Margin="0,8" />
-
                     <HorizontalStackLayout Spacing="8">
                         <Button Text="Enregistrer" Command="{Binding SaveCommand}" />
                         <Button Text="Annuler" Command="{Binding CancelCommand}" BackgroundColor="Transparent" TextColor="{StaticResource Gray500}" />
                     </HorizontalStackLayout>
-
-                    <Button Text="Supprimer" Command="{Binding DeleteCommand}" TextColor="{StaticResource Danger}" BackgroundColor="Transparent" HorizontalOptions="Start" />
 
                 </VerticalStackLayout>
             </Border>

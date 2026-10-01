@@ -35,4 +35,30 @@ public static class FolderTree
 
         return result;
     }
+
+    /// <summary>
+    /// Returns the ancestor chain from just-below-root down to (and including) the folder with id
+    /// <paramref name="folderId"/>, in top-to-bottom order. Excludes the true root folder. Empty if
+    /// <paramref name="folderId"/> IS the root folder's own id.
+    /// </summary>
+    public static List<Folder> CollectAncestorChain(IEnumerable<Folder> candidateFolders, Guid folderId)
+    {
+        var byId = candidateFolders.ToDictionary(f => f.Id);
+        var chain = new List<Folder>();
+        var current = byId[folderId];
+
+        while (!current.IsRoot)
+        {
+            chain.Add(current);
+            if (current.ParentId is null)
+            {
+                break;
+            }
+
+            current = byId[current.ParentId.Value];
+        }
+
+        chain.Reverse();
+        return chain;
+    }
 }

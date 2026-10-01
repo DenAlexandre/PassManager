@@ -85,26 +85,6 @@ public partial class EntryDetailViewModel(AuthSessionService authSession, INavig
     }
 
     [RelayCommand]
-    private async Task DeleteAsync()
-    {
-        var vault = authSession.Vault;
-        if (vault is null)
-        {
-            return;
-        }
-
-        var confirmed = await Shell.Current.CurrentPage.DisplayAlert("Confirmer", "Supprimer cette entrée ?", "Supprimer", "Annuler");
-        if (!confirmed)
-        {
-            return;
-        }
-
-        vault.DeleteEntry(_entryId);
-        await authSession.SaveVaultAsync();
-        await navigation.GoBackAsync();
-    }
-
-    [RelayCommand]
     private Task CancelAsync() => navigation.GoBackAsync();
 
     private static string? NullIfEmpty(string value) => string.IsNullOrWhiteSpace(value) ? null : value;

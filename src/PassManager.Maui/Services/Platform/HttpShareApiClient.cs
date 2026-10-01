@@ -26,5 +26,17 @@ public class HttpShareApiClient(HttpClient httpClient) : IShareApiClient
         return payload.NewFolderId;
     }
 
+    public async Task<Guid> ShareEntryAsync(Guid entryId, Guid targetUserId, CancellationToken ct = default)
+    {
+        var response = await httpClient.PostAsJsonAsync($"api/entries/{entryId}/share", new { targetUserId }, JsonOptions, ct);
+        response.EnsureSuccessStatusCode();
+
+        var payload = await response.Content.ReadFromJsonAsync<ShareEntryResponsePayload>(JsonOptions, ct)
+            ?? throw new InvalidOperationException("Réponse de partage invalide.");
+        return payload.NewEntryId;
+    }
+
     private record ShareResponsePayload(Guid NewFolderId);
+
+    private record ShareEntryResponsePayload(Guid NewEntryId);
 }

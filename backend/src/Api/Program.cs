@@ -35,6 +35,7 @@ builder.Services.AddScoped<FolderService>();
 builder.Services.AddScoped<EntryService>();
 builder.Services.AddScoped<SyncService>();
 builder.Services.AddScoped<FolderSharingService>();
+builder.Services.AddScoped<EntrySharingService>();
 
 var emailProvider = builder.Configuration["Email:Provider"] ?? "Console";
 if (emailProvider.Equals("Smtp", StringComparison.OrdinalIgnoreCase))

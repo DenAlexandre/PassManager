@@ -7,10 +7,11 @@ namespace PassManager.Maui.ViewModels;
 
 public partial class ShareViewModel(IShareApiClient shareApiClient) : ObservableObject, IQueryAttributable
 {
-    private Guid _folderId;
+    private Guid _itemId;
+    private bool _isEntry;
 
     [ObservableProperty]
-    private string folderName = "";
+    private string itemName = "";
 
     [ObservableProperty]
     private string query = "";
@@ -28,14 +29,24 @@ public partial class ShareViewModel(IShareApiClient shareApiClient) : Observable
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
-        if (query.TryGetValue("FolderId", out var id) && id is Guid folderId)
+        if (query.TryGetValue("FolderId", out var folderId) && folderId is Guid folderGuid)
         {
-            _folderId = folderId;
+            _itemId = folderGuid;
+            _isEntry = false;
+        }
+        else if (query.TryGetValue("EntryId", out var entryId) && entryId is Guid entryGuid)
+        {
+            _itemId = entryGuid;
+            _isEntry = true;
         }
 
-        if (query.TryGetValue("FolderName", out var name) && name is string folderNameValue)
+        if (query.TryGetValue("FolderName", out var folderName) && folderName is string folderNameValue)
         {
-            FolderName = folderNameValue;
+            ItemName = folderNameValue;
+        }
+        else if (query.TryGetValue("EntryName", out var entryName) && entryName is string entryNameValue)
+        {
+            ItemName = entryNameValue;
         }
     }
 
@@ -86,8 +97,16 @@ public partial class ShareViewModel(IShareApiClient shareApiClient) : Observable
         IsBusy = true;
         try
         {
-            await shareApiClient.ShareFolderAsync(_folderId, user.Id);
-            StatusMessage = $"« {FolderName} » a été partagé avec {user.Email}. Le destinataire le verra à sa prochaine synchronisation.";
+            if (_isEntry)
+            {
+                await shareApiClient.ShareEntryAsync(_itemId, user.Id);
+            }
+            else
+            {
+                await shareApiClient.ShareFolderAsync(_itemId, user.Id);
+            }
+
+            StatusMessage = $"« {ItemName} » a été partagé avec {user.Email}. Le destinataire le verra à sa prochaine synchronisation.";
         }
         catch (Exception)
         {

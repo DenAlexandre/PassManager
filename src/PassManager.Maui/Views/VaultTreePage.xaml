@@ -15,6 +15,8 @@
             <Label Grid.Column="0" Text="PassManager" Style="{StaticResource TitleLabel}" VerticalOptions="Center" />
             <ActivityIndicator Grid.Column="1" IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Margin="0,0,12,0" />
             <HorizontalStackLayout Grid.Column="2" Spacing="8">
+                <Button Text="⋯" WidthRequest="44" Command="{Binding ImportExportCommand}"
+                        BackgroundColor="Transparent" TextColor="{StaticResource Gray500}" />
                 <Button Text="Synchroniser" Command="{Binding SyncCommand}" />
                 <Button Text="Déconnexion" Command="{Binding LogoutCommand}"
                         BackgroundColor="Transparent" TextColor="{StaticResource Gray500}" />
@@ -85,7 +87,7 @@
                 <CollectionView Grid.Row="1" ItemsSource="{Binding Entries}">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="vm:EntryRowViewModel">
-                            <Grid Padding="20,12" ColumnDefinitions="*,*">
+                            <Grid Padding="20,12" ColumnDefinitions="*,*,Auto">
                                 <Grid.GestureRecognizers>
                                     <TapGestureRecognizer
                                         Command="{Binding BindingContext.OpenEntryCommand, Source={x:Reference RootPage}}"
@@ -93,6 +95,10 @@
                                 </Grid.GestureRecognizers>
                                 <Label Grid.Column="0" Text="{Binding Title}" FontFamily="OpenSansSemibold" />
                                 <Label Grid.Column="1" Text="{Binding Login}" TextColor="{StaticResource Gray500}" HorizontalOptions="End" />
+                                <Button Grid.Column="2" Text="⋯" WidthRequest="32" MinimumWidthRequest="32" MinimumHeightRequest="32"
+                                        Padding="0" TextColor="{StaticResource Gray500}" BackgroundColor="Transparent"
+                                        Command="{Binding BindingContext.EntryOptionsCommand, Source={x:Reference RootPage}}"
+                                        CommandParameter="{Binding .}" />
                             </Grid>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PassManager.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using PassManager.Infrastructure.Persistence;
 namespace PassManager.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(PassManagerDbContext))]
-    partial class PassManagerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261001140628_AddEntryShare")]
+    partial class AddEntryShare
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
