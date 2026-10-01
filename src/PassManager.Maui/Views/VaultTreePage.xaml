@@ -7,29 +7,60 @@
              x:DataType="vm:VaultTreeViewModel"
              Title="Mon coffre">
 
-    <Grid RowDefinitions="Auto,Auto,*,Auto,*" Padding="12" RowSpacing="8">
+    <Grid RowDefinitions="Auto,Auto,*" RowSpacing="0"
+          BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundLight}, Dark={StaticResource BackgroundDark}}">
 
-        <HorizontalStackLayout Grid.Row="0" Spacing="8">
-            <Button Text="Synchroniser" Command="{Binding SyncCommand}" />
-            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
-            <Button Text="Déconnexion" Command="{Binding LogoutCommand}" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" />
-        </HorizontalStackLayout>
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" Padding="20,14"
+              BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}">
+            <Label Grid.Column="0" Text="PassManager" Style="{StaticResource TitleLabel}" VerticalOptions="Center" />
+            <ActivityIndicator Grid.Column="1" IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Margin="0,0,12,0" />
+            <HorizontalStackLayout Grid.Column="2" Spacing="8">
+                <Button Text="Synchroniser" Command="{Binding SyncCommand}" />
+                <Button Text="Déconnexion" Command="{Binding LogoutCommand}"
+                        BackgroundColor="Transparent" TextColor="{StaticResource Gray500}" />
+            </HorizontalStackLayout>
+        </Grid>
 
-        <Label Grid.Row="1" Text="{Binding StatusMessage}" TextColor="Green"
-               IsVisible="{Binding StatusMessage, Converter={StaticResource StringToBoolConverter}}" />
-        <Label Grid.Row="1" Text="{Binding ErrorMessage}" TextColor="Red"
-               IsVisible="{Binding ErrorMessage, Converter={StaticResource StringToBoolConverter}}" />
+        <Grid Grid.Row="1" Padding="20,8" RowSpacing="0" IsVisible="{Binding StatusMessage, Converter={StaticResource StringToBoolConverter}}">
+            <Label Text="{Binding StatusMessage}" TextColor="{StaticResource Success}" Style="{StaticResource CaptionLabel}" />
+        </Grid>
+        <Grid Grid.Row="1" Padding="20,8" RowSpacing="0" IsVisible="{Binding ErrorMessage, Converter={StaticResource StringToBoolConverter}}">
+            <Label Text="{Binding ErrorMessage}" TextColor="{StaticResource Danger}" Style="{StaticResource CaptionLabel}" />
+        </Grid>
 
-        <Border Grid.Row="2" Stroke="LightGray" StrokeThickness="1">
-            <Grid RowDefinitions="Auto,*">
-                <Label Grid.Row="0" Text="Dossiers" FontAttributes="Bold" Padding="8,4" BackgroundColor="#f0f0f0" />
+        <Grid Grid.Row="2" ColumnDefinitions="280,1,*" Padding="0">
+
+            <Grid Grid.Column="0" RowDefinitions="Auto,*,Auto" Padding="0">
+                <Label Grid.Row="0" Text="Dossiers" Style="{StaticResource SectionHeaderLabel}" Padding="20,16" />
+
                 <CollectionView Grid.Row="1" ItemsSource="{Binding Folders}"
                                 SelectionMode="Single" SelectedItem="{Binding SelectedFolder}">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="vm:FolderNodeViewModel">
-                            <Grid Padding="4" ColumnDefinitions="*,Auto" Margin="{Binding Indent}">
-                                <Label Grid.Column="0" Text="{Binding Name}" VerticalOptions="Center" />
-                                <Button Grid.Column="1" Text="..." WidthRequest="40" Padding="0"
+                            <Grid Padding="8,10" ColumnDefinitions="Auto,24,*,Auto">
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroupList>
+                                        <VisualStateGroup x:Name="CommonStates">
+                                            <VisualState x:Name="Normal" />
+                                            <VisualState x:Name="Selected">
+                                                <VisualState.Setters>
+                                                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource Gray600}}" />
+                                                </VisualState.Setters>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                    </VisualStateGroupList>
+                                </VisualStateManager.VisualStateGroups>
+
+                                <BoxView Grid.Column="0" WidthRequest="{Binding IndentWidth}" Color="Transparent" />
+                                <Button Grid.Column="1" Text="{Binding IsExpanded, Converter={StaticResource ExpandedToChevronConverter}}"
+                                        WidthRequest="24" MinimumWidthRequest="24" MinimumHeightRequest="24"
+                                        Padding="0" FontSize="12" TextColor="{StaticResource Gray500}" BackgroundColor="Transparent"
+                                        IsVisible="{Binding HasChildren}"
+                                        Command="{Binding BindingContext.ToggleExpandCommand, Source={x:Reference RootPage}}"
+                                        CommandParameter="{Binding .}" />
+                                <Label Grid.Column="2" Text="{Binding Name, StringFormat='📁 {0}'}" VerticalOptions="Center" />
+                                <Button Grid.Column="3" Text="⋯" WidthRequest="32" MinimumWidthRequest="32" MinimumHeightRequest="32"
+                                        Padding="0" TextColor="{StaticResource Gray500}" BackgroundColor="Transparent"
                                         IsVisible="{Binding IsRoot, Converter={StaticResource InvertedBoolConverter}}"
                                         Command="{Binding BindingContext.FolderOptionsCommand, Source={x:Reference RootPage}}"
                                         CommandParameter="{Binding .}" />
@@ -37,34 +68,38 @@
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
+
+                <Button Grid.Row="2" Text="+ Nouveau dossier" Command="{Binding NewFolderCommand}"
+                        Margin="12" BackgroundColor="Transparent" TextColor="{StaticResource Primary}"
+                        HorizontalOptions="Start" />
             </Grid>
-        </Border>
 
-        <HorizontalStackLayout Grid.Row="3" Spacing="8">
-            <Button Text="Nouveau dossier" Command="{Binding NewFolderCommand}" />
-            <Button Text="Nouvelle entrée" Command="{Binding NewEntryCommand}" />
-        </HorizontalStackLayout>
+            <BoxView Grid.Column="1" WidthRequest="1" Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" />
 
-        <Border Grid.Row="4" Stroke="LightGray" StrokeThickness="1">
-            <Grid RowDefinitions="Auto,*">
-                <Label Grid.Row="0" Text="Entrées" FontAttributes="Bold" Padding="8,4" BackgroundColor="#f0f0f0" />
+            <Grid Grid.Column="2" RowDefinitions="Auto,*" Padding="0">
+                <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="20,16">
+                    <Label Grid.Column="0" Text="Entrées" Style="{StaticResource SectionHeaderLabel}" VerticalOptions="Center" />
+                    <Button Grid.Column="1" Text="+ Nouvelle entrée" Command="{Binding NewEntryCommand}" />
+                </Grid>
+
                 <CollectionView Grid.Row="1" ItemsSource="{Binding Entries}">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="vm:EntryRowViewModel">
-                            <Grid Padding="8" ColumnDefinitions="*,*">
+                            <Grid Padding="20,12" ColumnDefinitions="*,*">
                                 <Grid.GestureRecognizers>
                                     <TapGestureRecognizer
                                         Command="{Binding BindingContext.OpenEntryCommand, Source={x:Reference RootPage}}"
                                         CommandParameter="{Binding .}" />
                                 </Grid.GestureRecognizers>
-                                <Label Grid.Column="0" Text="{Binding Title}" FontAttributes="Bold" />
-                                <Label Grid.Column="1" Text="{Binding Login}" TextColor="Gray" HorizontalOptions="End" />
+                                <Label Grid.Column="0" Text="{Binding Title}" FontFamily="OpenSansSemibold" />
+                                <Label Grid.Column="1" Text="{Binding Login}" TextColor="{StaticResource Gray500}" HorizontalOptions="End" />
                             </Grid>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
             </Grid>
-        </Border>
+
+        </Grid>
 
     </Grid>
 

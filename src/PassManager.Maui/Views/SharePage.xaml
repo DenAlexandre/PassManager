@@ -8,35 +8,44 @@
              x:DataType="vm:ShareViewModel"
              Title="Partager">
 
-    <VerticalStackLayout Padding="20" Spacing="12">
+    <Grid HorizontalOptions="Center" Padding="30">
+        <Border WidthRequest="460"
+                BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}"
+                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+                StrokeShape="RoundRectangle 4" Padding="32,28">
+            <VerticalStackLayout Spacing="16">
 
-        <Label Text="{Binding FolderName, StringFormat='Partager « {0} »'}" Style="{StaticResource Headline}" />
-        <Label Text="Recherchez un compte par email (2 caractères minimum)." FontSize="12" />
+                <Label Text="{Binding FolderName, StringFormat='Partager « {0} »'}" Style="{StaticResource TitleLabel}" />
+                <Label Text="Recherchez un compte par email (2 caractères minimum)." Style="{StaticResource CaptionLabel}" />
 
-        <Grid ColumnDefinitions="*,Auto">
-            <Entry Grid.Column="0" Placeholder="email@exemple.com" Text="{Binding Query}" Keyboard="Email" />
-            <Button Grid.Column="1" Text="Rechercher" Command="{Binding SearchCommand}" />
-        </Grid>
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                    <Border Grid.Column="0" Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" StrokeShape="RoundRectangle 4" Padding="0">
+                        <Entry Placeholder="email@exemple.com" Text="{Binding Query}" Keyboard="Email" Margin="12,0" />
+                    </Border>
+                    <Button Grid.Column="1" Text="Rechercher" Command="{Binding SearchCommand}" />
+                </Grid>
 
-        <Label Text="{Binding StatusMessage}" TextColor="Green"
-               IsVisible="{Binding StatusMessage, Converter={StaticResource StringToBoolConverter}}" />
-        <Label Text="{Binding ErrorMessage}" TextColor="Red"
-               IsVisible="{Binding ErrorMessage, Converter={StaticResource StringToBoolConverter}}" />
-        <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
+                <Label Text="{Binding StatusMessage}" TextColor="{StaticResource Success}" Style="{StaticResource CaptionLabel}"
+                       IsVisible="{Binding StatusMessage, Converter={StaticResource StringToBoolConverter}}" />
+                <Label Text="{Binding ErrorMessage}" TextColor="{StaticResource Danger}" Style="{StaticResource CaptionLabel}"
+                       IsVisible="{Binding ErrorMessage, Converter={StaticResource StringToBoolConverter}}" />
+                <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
 
-        <CollectionView ItemsSource="{Binding Results}">
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="sharing:UserSummary">
-                    <Grid Padding="8" ColumnDefinitions="*,Auto">
-                        <Label Grid.Column="0" Text="{Binding Email}" VerticalOptions="Center" />
-                        <Button Grid.Column="1" Text="Partager"
-                                Command="{Binding BindingContext.ShareWithCommand, Source={x:Reference RootPage}}"
-                                CommandParameter="{Binding .}" />
-                    </Grid>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+                <CollectionView ItemsSource="{Binding Results}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="sharing:UserSummary">
+                            <Grid Padding="4,10" ColumnDefinitions="*,Auto">
+                                <Label Grid.Column="0" Text="{Binding Email}" VerticalOptions="Center" />
+                                <Button Grid.Column="1" Text="Partager"
+                                        Command="{Binding BindingContext.ShareWithCommand, Source={x:Reference RootPage}}"
+                                        CommandParameter="{Binding .}" />
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
 
-    </VerticalStackLayout>
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
 
 </ContentPage>

@@ -22,11 +22,24 @@ public partial class VaultTreeViewModel(AuthSessionService authSession, INavigat
     [ObservableProperty]
     private FolderNodeViewModel? selectedFolder;
 
+    private readonly HashSet<Guid> collapsedFolderIds = [];
+
     public ObservableCollection<FolderNodeViewModel> Folders { get; } = [];
 
     public ObservableCollection<EntryRowViewModel> Entries { get; } = [];
 
     public void OnAppearing() => RebuildTree();
+
+    [RelayCommand]
+    private void ToggleExpand(FolderNodeViewModel folder)
+    {
+        if (!collapsedFolderIds.Remove(folder.Id))
+        {
+            collapsedFolderIds.Add(folder.Id);
+        }
+
+        RebuildTree(SelectedFolder?.Id);
+    }
 
     partial void OnSelectedFolderChanged(FolderNodeViewModel? value) => RefreshEntries();
 
@@ -169,8 +182,16 @@ public partial class VaultTreeViewModel(AuthSessionService authSession, INavigat
 
     private void AddRecursive(VaultFolder folder, int depth, IReadOnlyList<VaultFolder> all)
     {
-        Folders.Add(new FolderNodeViewModel(folder, depth));
-        foreach (var child in all.Where(f => f.ParentId == folder.Id).OrderBy(f => f.Name, StringComparer.CurrentCultureIgnoreCase))
+        var children = all.Where(f => f.ParentId == folder.Id).OrderBy(f => f.Name, StringComparer.CurrentCultureIgnoreCase).ToList();
+        var isExpanded = !collapsedFolderIds.Contains(folder.Id);
+        Folders.Add(new FolderNodeViewModel(folder, depth, children.Count > 0, isExpanded));
+
+        if (!isExpanded)
+        {
+            return;
+        }
+
+        foreach (var child in children)
         {
             AddRecursive(child, depth + 1, all);
         }

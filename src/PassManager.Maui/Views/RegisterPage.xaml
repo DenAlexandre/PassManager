@@ -7,25 +7,38 @@
              Title="Créer un compte">
 
     <ScrollView>
-        <VerticalStackLayout Padding="30" Spacing="16" VerticalOptions="Center">
+        <Grid HorizontalOptions="Center" VerticalOptions="Center" Padding="30">
+            <Border WidthRequest="380"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}"
+                    Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+                    StrokeShape="RoundRectangle 4" Padding="32,36">
+                <VerticalStackLayout Spacing="18">
 
-            <Label Text="Nouveau compte" Style="{StaticResource Headline}" HorizontalOptions="Center" />
-            <Label Text="Ce mot de passe protège aussi votre coffre local" Style="{StaticResource SubHeadline}" HorizontalOptions="Center" />
+                    <Label Text="Nouveau compte" Style="{StaticResource Headline}" FontSize="26" />
+                    <Label Text="Ce mot de passe protège aussi votre coffre local" Style="{StaticResource CaptionLabel}" HorizontalOptions="Center" HorizontalTextAlignment="Center" />
 
-            <Entry Placeholder="Email" Keyboard="Email" Text="{Binding Email}" />
-            <Entry Placeholder="Mot de passe (8 caractères min.)" IsPassword="True" Text="{Binding Password}" />
-            <Entry Placeholder="Confirmer le mot de passe" IsPassword="True" Text="{Binding ConfirmPassword}" />
+                    <Border Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" StrokeShape="RoundRectangle 4" Padding="0">
+                        <Entry Placeholder="Email" Keyboard="Email" Text="{Binding Email}" Margin="12,0" />
+                    </Border>
+                    <Border Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" StrokeShape="RoundRectangle 4" Padding="0">
+                        <Entry Placeholder="Mot de passe (8 caractères min.)" IsPassword="True" Text="{Binding Password}" Margin="12,0" />
+                    </Border>
+                    <Border Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" StrokeShape="RoundRectangle 4" Padding="0">
+                        <Entry Placeholder="Confirmer le mot de passe" IsPassword="True" Text="{Binding ConfirmPassword}" Margin="12,0" />
+                    </Border>
 
-            <Label Text="{Binding ErrorMessage}"
-                   TextColor="Red"
-                   IsVisible="{Binding ErrorMessage, Converter={StaticResource StringToBoolConverter}}" />
+                    <Label Text="{Binding ErrorMessage}"
+                           TextColor="{StaticResource Danger}" Style="{StaticResource CaptionLabel}"
+                           IsVisible="{Binding ErrorMessage, Converter={StaticResource StringToBoolConverter}}" />
 
-            <Button Text="Créer mon compte" Command="{Binding RegisterCommand}" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}" />
-            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
+                    <Button Text="Créer mon compte" Command="{Binding RegisterCommand}" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}" HorizontalOptions="Fill" />
+                    <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
 
-            <Button Text="J'ai déjà un compte" Command="{Binding GoToLoginCommand}" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" />
+                    <Button Text="J'ai déjà un compte" Command="{Binding GoToLoginCommand}" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" />
 
-        </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
     </ScrollView>
 
 </ContentPage>

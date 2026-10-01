@@ -5,4 +5,26 @@
     xmlns:maui="using:Microsoft.Maui"
     xmlns:local="using:PassManager.Maui.WinUI">
 
+    <Application.Resources>
+        <ResourceDictionary>
+            <!--
+            MAUI's Entry/Editor are wrapped in a custom Border (see page XAML) to match the app's design.
+            The native WinUI TextBox control template draws its own border/background/focus-underline from
+            these theme resources regardless of the handler's BorderThickness/Background properties, which
+            otherwise only apply to the Normal visual state and get overridden on PointerOver/Focused. Zeroing
+            them out here is the supported way to fully suppress the native chrome app-wide.
+            -->
+            <Thickness x:Key="TextControlBorderThickness">0</Thickness>
+            <Thickness x:Key="TextControlBorderThicknessFocused">0</Thickness>
+            <SolidColorBrush x:Key="TextControlBorderBrush" Color="Transparent" />
+            <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="Transparent" />
+            <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="Transparent" />
+            <SolidColorBrush x:Key="TextControlBorderBrushDisabled" Color="Transparent" />
+            <SolidColorBrush x:Key="TextControlBackground" Color="Transparent" />
+            <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="Transparent" />
+            <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="Transparent" />
+            <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="Transparent" />
+        </ResourceDictionary>
+    </Application.Resources>
+
 </maui:MauiWinUIApplication>

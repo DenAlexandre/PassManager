@@ -12,6 +12,7 @@
             </ResourceDictionary.MergedDictionaries>
             <converters:StringToBoolConverter x:Key="StringToBoolConverter" />
             <converters:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+            <converters:ExpandedToChevronConverter x:Key="ExpandedToChevronConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

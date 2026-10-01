@@ -11,4 +11,8 @@
         ContentTemplate="{DataTemplate views:LoginPage}"
         Route="LoginPage" />
 
+    <ShellContent
+        ContentTemplate="{DataTemplate views:VaultTreePage}"
+        Route="VaultTreePage" />
+
 </Shell>

@@ -7,24 +7,37 @@
              Title="Connexion">
 
     <ScrollView>
-        <VerticalStackLayout Padding="30" Spacing="16" VerticalOptions="Center">
+        <Grid HorizontalOptions="Center" VerticalOptions="Center" Padding="30">
+            <Border WidthRequest="380"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}"
+                    Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+                    StrokeShape="RoundRectangle 4" Padding="32,36">
+                <VerticalStackLayout Spacing="18">
 
-            <Label Text="PassManager" Style="{StaticResource Headline}" HorizontalOptions="Center" />
-            <Label Text="Connectez-vous à votre coffre" Style="{StaticResource SubHeadline}" HorizontalOptions="Center" />
+                    <Label Text="PassManager" Style="{StaticResource Headline}" FontSize="26" />
+                    <Label Text="Connectez-vous à votre coffre" Style="{StaticResource CaptionLabel}" HorizontalOptions="Center" />
 
-            <Entry Placeholder="Email" Keyboard="Email" Text="{Binding Email}" />
-            <Entry Placeholder="Mot de passe" IsPassword="True" Text="{Binding Password}" />
+                    <Border Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" StrokeShape="RoundRectangle 4" Padding="0">
+                        <Entry Placeholder="Email" Keyboard="Email" Text="{Binding Email}" Margin="12,0"
+                               ReturnType="Next" />
+                    </Border>
+                    <Border Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" StrokeShape="RoundRectangle 4" Padding="0">
+                        <Entry Placeholder="Mot de passe" IsPassword="True" Text="{Binding Password}" Margin="12,0"
+                               ReturnType="Go" ReturnCommand="{Binding LoginCommand}" />
+                    </Border>
 
-            <Label Text="{Binding ErrorMessage}"
-                   TextColor="Red"
-                   IsVisible="{Binding ErrorMessage, Converter={StaticResource StringToBoolConverter}}" />
+                    <Label Text="{Binding ErrorMessage}"
+                           TextColor="{StaticResource Danger}" Style="{StaticResource CaptionLabel}"
+                           IsVisible="{Binding ErrorMessage, Converter={StaticResource StringToBoolConverter}}" />
 
-            <Button Text="Se connecter" Command="{Binding LoginCommand}" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}" />
-            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
+                    <Button Text="Se connecter" Command="{Binding LoginCommand}" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}" HorizontalOptions="Fill" />
+                    <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
 
-            <Button Text="Créer un compte" Command="{Binding GoToRegisterCommand}" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" />
+                    <Button Text="Créer un compte" Command="{Binding GoToRegisterCommand}" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" />
 
-        </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
     </ScrollView>
 
 </ContentPage>

@@ -10,7 +10,6 @@ public partial class AppShell : Shell
 
         Routing.RegisterRoute(nameof(RegisterPage), typeof(RegisterPage));
         Routing.RegisterRoute(nameof(ConfirmEmailPendingPage), typeof(ConfirmEmailPendingPage));
-        Routing.RegisterRoute(nameof(VaultTreePage), typeof(VaultTreePage));
         Routing.RegisterRoute(nameof(EntryDetailPage), typeof(EntryDetailPage));
         Routing.RegisterRoute(nameof(SharePage), typeof(SharePage));
     }
