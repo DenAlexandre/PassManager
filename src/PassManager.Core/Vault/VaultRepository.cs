@@ -51,6 +51,30 @@ public class VaultRepository(VaultDocument document, IClock clock)
         folder.UpdatedAt = clock.UtcNow;
     }
 
+    public void MoveFolder(Guid folderId, Guid newParentId)
+    {
+        var folder = RequireFolder(folderId);
+        if (folder.IsRoot)
+        {
+            throw new InvalidOperationException("Le dossier Racine ne peut pas être déplacé.");
+        }
+
+        RequireFolder(newParentId);
+
+        if (CollectDescendantIds(folderId).Contains(newParentId))
+        {
+            throw new InvalidOperationException("Impossible de déplacer un dossier dans lui-même ou l'un de ses sous-dossiers.");
+        }
+
+        if (folder.ParentId == newParentId)
+        {
+            return;
+        }
+
+        folder.ParentId = newParentId;
+        folder.UpdatedAt = clock.UtcNow;
+    }
+
     public void DeleteFolder(Guid folderId)
     {
         var folder = RequireFolder(folderId);

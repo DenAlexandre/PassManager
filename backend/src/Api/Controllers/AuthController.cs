@@ -30,6 +30,17 @@ public class AuthController(AuthService authService) : ControllerBase
         return Ok(new { message = "Compte confirmé, vous pouvez vous connecter." });
     }
 
+    [HttpGet("confirm-email")]
+    public async Task<ContentResult> ConfirmEmailFromLink([FromQuery] string email, [FromQuery] string token, CancellationToken ct)
+    {
+        var confirmed = await authService.ConfirmEmailAsync(email, token, ct);
+        var html = confirmed
+            ? "<!doctype html><html><head><meta charset=\"utf-8\"><title>Compte confirmé</title></head><body><h1>Compte confirmé</h1><p>Vous pouvez maintenant vous connecter dans l'application PassManager.</p></body></html>"
+            : "<!doctype html><html><head><meta charset=\"utf-8\"><title>Lien invalide</title></head><body><h1>Lien invalide ou expiré</h1><p>Merci de redemander un nouveau lien de confirmation depuis l'application.</p></body></html>";
+
+        return Content(html, "text/html");
+    }
+
     [HttpPost("resend-confirmation")]
     public async Task<IActionResult> ResendConfirmation(ResendConfirmationRequestDto request, CancellationToken ct)
     {

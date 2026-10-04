@@ -45,7 +45,43 @@ public partial class VaultTreeViewModel(AuthSessionService authSession, INavigat
         RebuildTree(SelectedFolder?.Id);
     }
 
-    partial void OnSelectedFolderChanged(FolderNodeViewModel? value) => RefreshEntries();
+    partial void OnSelectedFolderChanged(FolderNodeViewModel? oldValue, FolderNodeViewModel? newValue)
+    {
+        if (oldValue is not null)
+        {
+            oldValue.IsSelected = false;
+        }
+
+        if (newValue is not null)
+        {
+            newValue.IsSelected = true;
+        }
+
+        RefreshEntries();
+    }
+
+    [RelayCommand]
+    private void SelectFolder(FolderNodeViewModel folder) => SelectedFolder = folder;
+
+    private FolderNodeViewModel? draggedFolder;
+
+    [RelayCommand]
+    private void FolderDragStarting(FolderNodeViewModel folder) =>
+        draggedFolder = folder.IsRoot ? null : folder;
+
+    [RelayCommand]
+    private async Task FolderDropAsync(FolderNodeViewModel target)
+    {
+        var source = draggedFolder;
+        draggedFolder = null;
+
+        if (source is null || source.Id == target.Id)
+        {
+            return;
+        }
+
+        await MoveFoldersAsync([source.Id], target.Id);
+    }
 
     [RelayCommand]
     private async Task SyncAsync()
@@ -93,6 +129,42 @@ public partial class VaultTreeViewModel(AuthSessionService authSession, INavigat
         vault.CreateFolder(SelectedFolder.Id, name.Trim());
         await authSession.SaveVaultAsync();
         RebuildTree(SelectedFolder.Id);
+    }
+
+    public async Task MoveFoldersAsync(IReadOnlyList<Guid> folderIds, Guid targetFolderId)
+    {
+        var vault = authSession.Vault;
+        if (vault is null || folderIds.Count == 0)
+        {
+            return;
+        }
+
+        var moved = false;
+        foreach (var folderId in folderIds)
+        {
+            if (folderId == targetFolderId)
+            {
+                continue;
+            }
+
+            try
+            {
+                vault.MoveFolder(folderId, targetFolderId);
+                moved = true;
+            }
+            catch (InvalidOperationException)
+            {
+                // Déplacement invalide (racine, ou cible = soi-même/un de ses sous-dossiers) : ignoré.
+            }
+        }
+
+        if (!moved)
+        {
+            return;
+        }
+
+        await authSession.SaveVaultAsync();
+        RebuildTree(targetFolderId);
     }
 
     [RelayCommand]

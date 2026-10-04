@@ -46,7 +46,7 @@ public class AuthService(
             Id = Guid.NewGuid(),
             OwnerId = user.Id,
             ParentId = null,
-            Name = Folder.RootName,
+            Name = email,
             IsRoot = true,
             Version = 1,
             CreatedAt = now,
@@ -60,7 +60,7 @@ public class AuthService(
         await db.SaveChangesAsync(ct);
 
         var link = BuildConfirmationLink(email, rawToken);
-        await emailSender.SendConfirmationEmailAsync(email, link, ct);
+        await emailSender.SendConfirmationEmailAsync(email, link, rawToken, ct);
 
         return new RegisterResult(true, AuthError.None);
     }
@@ -116,7 +116,7 @@ public class AuthService(
         await db.SaveChangesAsync(ct);
 
         var link = BuildConfirmationLink(email, rawToken);
-        await emailSender.SendConfirmationEmailAsync(email, link, ct);
+        await emailSender.SendConfirmationEmailAsync(email, link, rawToken, ct);
     }
 
     public async Task<LoginResult> LoginAsync(string email, string password, string? deviceId, CancellationToken ct = default)

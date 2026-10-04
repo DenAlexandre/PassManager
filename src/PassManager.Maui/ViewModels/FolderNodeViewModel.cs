@@ -15,4 +15,7 @@ public partial class FolderNodeViewModel(VaultFolder folder, int depth, bool has
 
     [ObservableProperty]
     private bool isExpanded = isExpanded;
+
+    [ObservableProperty]
+    private bool isSelected;
 }

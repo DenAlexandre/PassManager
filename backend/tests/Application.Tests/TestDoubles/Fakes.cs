@@ -30,15 +30,15 @@ public class FakeTokenService : ITokenService
     }
 }
 
-public record SentEmail(string ToEmail, string ConfirmationLink);
+public record SentEmail(string ToEmail, string ConfirmationLink, string ConfirmationCode);
 
 public class FakeEmailSender : IEmailSender
 {
     public readonly List<SentEmail> Sent = [];
 
-    public Task SendConfirmationEmailAsync(string toEmail, string confirmationLink, CancellationToken ct = default)
+    public Task SendConfirmationEmailAsync(string toEmail, string confirmationLink, string confirmationCode, CancellationToken ct = default)
     {
-        Sent.Add(new SentEmail(toEmail, confirmationLink));
+        Sent.Add(new SentEmail(toEmail, confirmationLink, confirmationCode));
         return Task.CompletedTask;
     }
 }

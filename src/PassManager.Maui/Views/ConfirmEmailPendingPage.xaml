@@ -18,7 +18,7 @@
                     <Label Text="{Binding Email, StringFormat='Un lien de confirmation a été envoyé à {0}.'}"
                            Style="{StaticResource CaptionLabel}" HorizontalOptions="Center" HorizontalTextAlignment="Center" />
 
-                    <Label Text="En environnement de développement (sans fournisseur d'email configuré), le lien est journalisé dans les logs du conteneur « api » (docker compose logs api). Collez le code ci-dessous :"
+                    <Label Text="Cliquez le lien reçu par email pour confirmer votre compte, puis retournez à la connexion. Vous pouvez aussi coller ici le code de confirmation contenu dans le lien :"
                            Style="{StaticResource CaptionLabel}" />
 
                     <Border Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" StrokeShape="RoundRectangle 4" Padding="0">

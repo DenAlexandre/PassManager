@@ -8,7 +8,7 @@ public class SmtpEmailSender(IOptions<EmailOptions> options) : IEmailSender
 {
     private readonly EmailOptions.SmtpOptions _smtp = options.Value.Smtp;
 
-    public async Task SendConfirmationEmailAsync(string toEmail, string confirmationLink, CancellationToken ct = default)
+    public async Task SendConfirmationEmailAsync(string toEmail, string confirmationLink, string confirmationCode, CancellationToken ct = default)
     {
         var message = new MimeMessage();
         message.From.Add(MailboxAddress.Parse(_smtp.From));
@@ -16,7 +16,7 @@ public class SmtpEmailSender(IOptions<EmailOptions> options) : IEmailSender
         message.Subject = "Confirmez votre compte PassManager";
         message.Body = new TextPart("plain")
         {
-            Text = $"Bienvenue sur PassManager.\n\nConfirmez votre compte en suivant ce lien :\n{confirmationLink}\n\nCe lien expire dans 24 heures."
+            Text = $"Bienvenue sur PassManager.\n\nConfirmez votre compte en suivant ce lien :\n{confirmationLink}\n\nOu collez ce code de confirmation dans l'application :\n{confirmationCode}\n\nCe lien et ce code expirent dans 24 heures."
         };
 
         using var client = new MailKit.Net.Smtp.SmtpClient();

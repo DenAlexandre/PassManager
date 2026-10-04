@@ -37,6 +37,49 @@ public class VaultRepositoryTests
     }
 
     [Fact]
+    public void MoveFolder_ToAnotherFolder_UpdatesParentAndBumpsUpdatedAt()
+    {
+        var (repo, clock, rootId) = CreateSutWithRoot();
+        var source = repo.CreateFolder(rootId, "Source");
+        var target = repo.CreateFolder(rootId, "Cible");
+
+        clock.UtcNow = clock.UtcNow.AddMinutes(5);
+        repo.MoveFolder(source.Id, target.Id);
+
+        Assert.Equal(target.Id, source.ParentId);
+        Assert.Equal(clock.UtcNow, source.UpdatedAt);
+        Assert.Contains(source, repo.GetChildFolders(target.Id));
+    }
+
+    [Fact]
+    public void MoveFolder_OnRoot_Throws()
+    {
+        var (repo, _, rootId) = CreateSutWithRoot();
+        var target = repo.CreateFolder(rootId, "Cible");
+
+        Assert.Throws<InvalidOperationException>(() => repo.MoveFolder(rootId, target.Id));
+    }
+
+    [Fact]
+    public void MoveFolder_IntoOwnDescendant_Throws()
+    {
+        var (repo, _, rootId) = CreateSutWithRoot();
+        var parent = repo.CreateFolder(rootId, "Parent");
+        var child = repo.CreateFolder(parent.Id, "Enfant");
+
+        Assert.Throws<InvalidOperationException>(() => repo.MoveFolder(parent.Id, child.Id));
+    }
+
+    [Fact]
+    public void MoveFolder_IntoItself_Throws()
+    {
+        var (repo, _, rootId) = CreateSutWithRoot();
+        var folder = repo.CreateFolder(rootId, "Dossier");
+
+        Assert.Throws<InvalidOperationException>(() => repo.MoveFolder(folder.Id, folder.Id));
+    }
+
+    [Fact]
     public void DeleteFolder_OnRoot_Throws()
     {
         var (repo, _, rootId) = CreateSutWithRoot();

@@ -37,7 +37,7 @@ public class AuthServiceTests
         Assert.Equal(16, user.VaultSalt.Length);
 
         var rootFolder = await db.Folders.SingleAsync();
-        Assert.Equal(Folder.RootName, rootFolder.Name);
+        Assert.Equal("alice@example.com", rootFolder.Name);
         Assert.True(rootFolder.IsRoot);
         Assert.Equal(user.Id, rootFolder.OwnerId);
         Assert.Null(rootFolder.ParentId);

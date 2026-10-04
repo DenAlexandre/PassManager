@@ -8,7 +8,9 @@ public partial class VaultTreePage : ContentPage
     private const double MaxFoldersColumnWidth = 480;
 
     private readonly VaultTreeViewModel _viewModel;
-    private double _panStartWidth;
+    private bool _isDraggingSplitter;
+    private double _dragStartWidth;
+    private double _dragStartX;
 
     public VaultTreePage(VaultTreeViewModel viewModel)
     {
@@ -22,20 +24,39 @@ public partial class VaultTreePage : ContentPage
         _viewModel.OnAppearing();
     }
 
-    private void OnSplitterPanUpdated(object? sender, PanUpdatedEventArgs e)
+    private void OnSplitterPointerPressed(object? sender, PointerEventArgs e)
     {
-        var foldersColumn = ContentGrid.ColumnDefinitions[0];
-
-        switch (e.StatusType)
+        var position = e.GetPosition(ContentGrid);
+        if (position is null)
         {
-            case GestureStatus.Started:
-                _panStartWidth = foldersColumn.Width.Value;
-                break;
-
-            case GestureStatus.Running:
-                var newWidth = Math.Clamp(_panStartWidth + e.TotalX, MinFoldersColumnWidth, MaxFoldersColumnWidth);
-                foldersColumn.Width = new GridLength(newWidth);
-                break;
+            return;
         }
+
+        _isDraggingSplitter = true;
+        _dragStartWidth = ContentGrid.ColumnDefinitions[0].Width.Value;
+        _dragStartX = position.Value.X;
+    }
+
+    private void OnContentGridPointerMoved(object? sender, PointerEventArgs e)
+    {
+        if (!_isDraggingSplitter)
+        {
+            return;
+        }
+
+        var position = e.GetPosition(ContentGrid);
+        if (position is null)
+        {
+            return;
+        }
+
+        var deltaX = position.Value.X - _dragStartX;
+        var newWidth = Math.Clamp(_dragStartWidth + deltaX, MinFoldersColumnWidth, MaxFoldersColumnWidth);
+        ContentGrid.ColumnDefinitions[0].Width = new GridLength(newWidth);
+    }
+
+    private void OnSplitterPointerReleased(object? sender, PointerEventArgs e)
+    {
+        _isDraggingSplitter = false;
     }
 }

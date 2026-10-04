@@ -5,10 +5,10 @@ namespace PassManager.Infrastructure.Email;
 
 public class DevConsoleEmailSender(ILogger<DevConsoleEmailSender> logger) : IEmailSender
 {
-    public Task SendConfirmationEmailAsync(string toEmail, string confirmationLink, CancellationToken ct = default)
+    public Task SendConfirmationEmailAsync(string toEmail, string confirmationLink, string confirmationCode, CancellationToken ct = default)
     {
         logger.LogInformation(
-            "[DEV EMAIL] Confirmation pour {Email} : {Link}", toEmail, confirmationLink);
+            "[DEV EMAIL] Confirmation pour {Email} : {Link} (code : {Code})", toEmail, confirmationLink, confirmationCode);
         return Task.CompletedTask;
     }
 }
