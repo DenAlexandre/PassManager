@@ -21,6 +21,15 @@ public partial class LoginViewModel(AuthSessionService authSession, INavigationS
     [ObservableProperty]
     private bool isBusy;
 
+    public async Task OnAppearingAsync()
+    {
+        var lastEmail = await authSession.GetLastLoginEmailAsync();
+        if (!string.IsNullOrEmpty(lastEmail))
+        {
+            Email = lastEmail;
+        }
+    }
+
     [RelayCommand]
     private async Task LoginAsync()
     {
@@ -43,6 +52,14 @@ public partial class LoginViewModel(AuthSessionService authSession, INavigationS
             await navigation.NavigateToAsync(nameof(ConfirmEmailPendingPage), new Dictionary<string, object> { ["Email"] = Email.Trim() });
         }
         catch (AuthApiException ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+        catch (PassManager.Core.Vault.VaultAuthenticationException ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+        catch (InvalidOperationException ex)
         {
             ErrorMessage = ex.Message;
         }

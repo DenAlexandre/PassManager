@@ -13,6 +13,7 @@
             <converters:StringToBoolConverter x:Key="StringToBoolConverter" />
             <converters:InvertedBoolConverter x:Key="InvertedBoolConverter" />
             <converters:ExpandedToChevronConverter x:Key="ExpandedToChevronConverter" />
+            <converters:OnlineStatusConverter x:Key="OnlineStatusConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -26,13 +26,20 @@ public partial class VaultTreeViewModel(AuthSessionService authSession, INavigat
     [ObservableProperty]
     private bool isMenuOpen;
 
+    [ObservableProperty]
+    private bool isOfflineMode;
+
     private readonly HashSet<Guid> collapsedFolderIds = [];
 
     public ObservableCollection<FolderNodeViewModel> Folders { get; } = [];
 
     public ObservableCollection<EntryRowViewModel> Entries { get; } = [];
 
-    public void OnAppearing() => RebuildTree();
+    public void OnAppearing()
+    {
+        IsOfflineMode = authSession.IsOffline;
+        RebuildTree();
+    }
 
     [RelayCommand]
     private void ToggleExpand(FolderNodeViewModel folder)
@@ -97,12 +104,14 @@ public partial class VaultTreeViewModel(AuthSessionService authSession, INavigat
         try
         {
             await authSession.SyncAsync();
+            IsOfflineMode = authSession.IsOffline;
             var selectedId = SelectedFolder?.Id;
             RebuildTree(selectedId);
             StatusMessage = "Synchronisation terminée.";
         }
         catch (Exception)
         {
+            IsOfflineMode = authSession.IsOffline;
             ErrorMessage = "Synchronisation impossible (serveur injoignable ?).";
         }
         finally
